@@ -4,7 +4,7 @@ import os
 import glob
 import math
 import csv
-
+import time
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     """
     Call in a loop to create terminal progress bar
@@ -138,6 +138,7 @@ data_destination_path = "/Users/apoorva/Desktop/INSTRSOP/Fall-Detection-ML/Featu
 i=0
 l=389
 nan_list = []
+start=time.time()
 Fall_occurance = 0
 printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
 with open(data_destination_path, 'w') as out_file:
@@ -164,3 +165,5 @@ with open(data_destination_path, 'w') as out_file:
 with open("nan_files.txt", 'w') as file1:
         for i in nan_list:
             file1.write(i+'\n')
+end=time.time()
+print(end-start)
