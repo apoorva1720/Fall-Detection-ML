@@ -2,6 +2,7 @@ import threading
 import pandas as pd
 import numpy
 import time
+import csv
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -20,13 +21,13 @@ sensitivity = 0
 false_rate = 0
 specificity = 0
 #Defining global variables
-epochs = 1
-#algorithms = ["SVM"]
-algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
+epochs = 100
+algo = "Random Forest"
+#algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
 
 #Defining data loading function for single thread execution
-def _LoadData_SingleThread():
-
+def _LoadData_SingleThread(array):
+	data_time_s = time.time()
 	dataset = pd.read_csv('Features.csv')
 	dataset.dropna(axis = 0, inplace = True)
 	X = dataset.iloc[:, :-1].values
@@ -37,11 +38,15 @@ def _LoadData_SingleThread():
 	sc = StandardScaler()
 	X_train = sc.fit_transform(X_train)
 	X_test = sc.transform(X_test)
+	data_time_e = time.time()
+	data_time = data_time_e-data_time_s
+	print("Data Loading time: " + str(data_time))
+	array.append(data_time)
 	return X_train, X_test, y_train, y_test
 
 #Defining ML training function for single thread execution
-def _TrainModel_SingleThread(X_train, X_test, y_train, y_test, ModelName):
-
+def _TrainModel_SingleThread(X_train, X_test, y_train, y_test, ModelName, array):
+	training_time_s = time.time()
 	if ModelName == "SVM":
 		classifier = SVC(C=10, kernel = 'rbf', random_state = 0, probability=True)
 		classifier.fit(X_train, y_train)
@@ -66,14 +71,18 @@ def _TrainModel_SingleThread(X_train, X_test, y_train, y_test, ModelName):
 		classifier = RandomForestClassifier(n_estimators = 100)
 		classifier.fit(X_train, y_train)
 		scores = cross_val_score(classifier, X_train, y_train, cv=10)
-
+	training_time_e = time.time()
+	training_time = training_time_e-training_time_s
+	print("Training time: " + str(training_time))
+	array.append(training_time)
 	return classifier
 
 
 
 
 #Defining ML testing function for single thread execution
-def _TestModel_SingleThread(classifier):
+def _TestModel_SingleThread(classifier, array):
+	testing_time_s = time.time()
 	y_pred = classifier.predict(X_test)
 	cm = confusion_matrix(y_test, y_pred)
 	tp = cm[0][0]
@@ -89,27 +98,27 @@ def _TestModel_SingleThread(classifier):
 	print(specificity)
 	print(cm)
 	print(accuracy)
-
+	testing_time_e = time.time()
+	testing_time = testing_time_e-testing_time_s
+	print("Testing time: " + str(testing_time))
+	array.append(testing_time)
 
 	
 
 
+f = open("RF_Data_M1.csv", "w")
+writer = csv.writer(f)
 
 with tqdm(range(epochs)) as epochLoop:
 	for _ in epochLoop:
-		for algo in algorithms:
-			print("######################################")
-			print("Starting Algorithm test: " + algo)
-			# loadData
-			X_train, X_test, y_train, y_test = _LoadData_SingleThread()
-    
-			# trainModel
-			classifier = _TrainModel_SingleThread(X_train, X_test, y_train, y_test, algo)
-    
-			#testModel
-			_TestModel_SingleThread(classifier)
-			print("Finished Algorithm test: " + algo)
-			print("######################################")
+		# loadData
+		array =[]
+		X_train, X_test, y_train, y_test = _LoadData_SingleThread(array)
+		# trainModel
+		classifier = _TrainModel_SingleThread(X_train, X_test, y_train, y_test, algo, array)
+		#testModel
+		_TestModel_SingleThread(classifier, array)
+		writer.writerow(array)
 
 
 
