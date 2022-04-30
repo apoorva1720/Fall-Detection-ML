@@ -22,8 +22,8 @@ false_rate = 0
 specificity = 0
 #Defining global variables
 epochs = 100
-algo = "Random Forest"
-#algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
+#algo = "SVM"
+algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
 
 #Defining data loading function for single thread execution
 def _LoadData_SingleThread(array):
@@ -93,11 +93,6 @@ def _TestModel_SingleThread(classifier, array):
 	false_rate = fn / (tp+fn)
 	specificity = tn /(tn+fp)
 	accuracy = accuracy_score(y_test,y_pred)
-	print(sensitivity)
-	print(false_rate)
-	print(specificity)
-	print(cm)
-	print(accuracy)
 	testing_time_e = time.time()
 	testing_time = testing_time_e-testing_time_s
 	print("Testing time: " + str(testing_time))
@@ -105,12 +100,10 @@ def _TestModel_SingleThread(classifier, array):
 
 	
 
-
-f = open("RF_Data_M1.csv", "w")
-writer = csv.writer(f)
-
-with tqdm(range(epochs)) as epochLoop:
-	for _ in epochLoop:
+for algo in algorithms:
+	f = open((algo + "_Data_i5.csv"), "w")
+	writer = csv.writer(f)
+	for u in tqdm(range(epochs)):
 		# loadData
 		array =[]
 		X_train, X_test, y_train, y_test = _LoadData_SingleThread(array)
@@ -119,7 +112,7 @@ with tqdm(range(epochs)) as epochLoop:
 		#testModel
 		_TestModel_SingleThread(classifier, array)
 		writer.writerow(array)
-
+	f.close()
 
 
 
