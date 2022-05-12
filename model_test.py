@@ -21,7 +21,7 @@ sensitivity = 0
 false_rate = 0
 specificity = 0
 #Defining global variables
-epochs = 1
+epochs = 100
 #algo = "SVM"
 algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
 
@@ -105,8 +105,8 @@ def _TestModel_SingleThread(classifier, array):
 	
 
 for algo in algorithms:
-	#f = open((algo + "_Data_i5.csv"), "w")
-	#writer = csv.writer(f)
+	f = open(("Results_" + algo + "_i5.csv"), "w")
+	writer = csv.writer(f)
 	print(algo)
 	for u in tqdm(range(epochs)):
 		# loadData
@@ -116,8 +116,8 @@ for algo in algorithms:
 		classifier = _TrainModel_SingleThread(X_train, X_test, y_train, y_test, algo, array)
 		#testModel
 		_TestModel_SingleThread(classifier, array)
-		#writer.writerow(array)
-	#f.close()
+		writer.writerow(array)
+	f.close()
 
 
 
