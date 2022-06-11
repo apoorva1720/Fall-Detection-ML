@@ -41,7 +41,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         
         
 
-knn_file = open(("Results_KNN_ourdata.csv"), "w")
+knn_file = open(("Results_KNN_CleanValues.csv"), "w")
 writer = csv.writer(knn_file)
 
 data_time_s = time.time()
