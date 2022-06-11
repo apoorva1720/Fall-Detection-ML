@@ -37,7 +37,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 
 
 
-knn_file = open(("Results_KNN_ourdata.csv"), "w")
+knn_file = open(("Results_KNN_RawValues.csv"), "w")
 writer = csv.writer(knn_file)
 
 data_time_s = time.time()
@@ -70,7 +70,7 @@ print("Data Loading time: " + str(data_time))
 
 array=[]
 
-for i in range(1,251,2):
+for i in range(1,201,2):
 	array.append(i)
 	training_time_s_1 = time.time()
 	classifier_1 = KNeighborsClassifier(n_neighbors = i, metric = "euclidean")
@@ -82,12 +82,6 @@ for i in range(1,251,2):
 	classifier_2.fit(X_train, y_train)
 	scores_2 = cross_val_score(classifier_2, X_train, y_train)
 	training_time_e_2 = time.time()
-	training_time_s_3 = time.time()
-	#classifier_3 = KNeighborsClassifier(n_neighbors = i, metric = "hamming")
-	#classifier_3.fit(X_train, y_train)
-	#scores_3= cross_val_score(classifier_3, X_train, y_train)
-	training_time_e_3 = time.time()
-
 	training_time_s_5 = time.time()
 	classifier_5 = KNeighborsClassifier(n_neighbors = i, metric = "minkowski")
 	classifier_5.fit(X_train, y_train)
@@ -96,59 +90,41 @@ for i in range(1,251,2):
 	
 	training_time_1 = training_time_e_1-training_time_s_1
 	training_time_2 = training_time_e_2-training_time_s_2
-	training_time_3 = training_time_e_3-training_time_s_3
-	#training_time_4 = training_time_e_4-training_time_s_4
 	training_time_5 = training_time_e_5-training_time_s_5
 	
 	array.append(training_time_1)
 	array.append(training_time_2)
-	array.append(training_time_3)
-	#array.append(training_time_4)
 	array.append(training_time_5)
 
 	testing_time_s_1 = time.time()
 	y_pred = classifier_1.predict(X_test)
-	
 	accuracy_1 = accuracy_score(y_test,y_pred)
 	testing_time_e_1 = time.time()
 	
 	testing_time_s_2 = time.time()
 	y_pred = classifier_2.predict(X_test)
-
 	accuracy_2 = accuracy_score(y_test,y_pred)
 	testing_time_e_2 = time.time()
-	
-	testing_time_s_3 = time.time()
-	#y_pred = classifier_3.predict(X_test)
-
-	accuracy_3 = 0 #accuracy_score(y_test,y_pred)
-	testing_time_e_3 = time.time()
 	
 	
 	testing_time_s_5 = time.time()
 	y_pred = classifier_5.predict(X_test)
-
 	accuracy_5 = accuracy_score(y_test,y_pred)
 	testing_time_e_5 = time.time()
 	
 	testing_time_1 = testing_time_e_1-testing_time_s_1
 	testing_time_2 = testing_time_e_2-testing_time_s_2
-	testing_time_3 = testing_time_e_3-testing_time_s_3
-
 	testing_time_5 = testing_time_e_5-testing_time_s_5
 	array.append(testing_time_1)
 	array.append(testing_time_2)
-	array.append(testing_time_3)
-
 	array.append(testing_time_5)
-	
 	array.append(accuracy_1)
 	array.append(accuracy_2)
-	array.append(accuracy_3)
-
 	array.append(accuracy_5)
+	
 	writer.writerow(array)
 	print(array)
 	array = []
+	
 	printProgressBar(i, 249, prefix = ' Progress:', suffix = 'Complete', length = 50)
 knn_file.close()
