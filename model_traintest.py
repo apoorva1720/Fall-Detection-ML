@@ -21,8 +21,8 @@ sensitivity = 0
 false_rate = 0
 specificity = 0
 #Defining global variables
-epochs = 100
-#algo = "SVM"
+epochs = 1
+#algo = "SVM"mo
 algorithms = ["SVM", "KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
 
 #Defining data loading function for single thread execution
@@ -33,7 +33,7 @@ def _LoadData_SingleThread(array):
 	X = dataset.iloc[:, :-1].values
 	y = dataset.iloc[:,-1].values
 	
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0)
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
 	
 	sc = StandardScaler()
 	X_train = sc.fit_transform(X_train)
@@ -105,8 +105,8 @@ def _TestModel_SingleThread(classifier, array):
 	
 
 for algo in algorithms:
-	f = open(("Results_" + algo + "_i5.csv"), "w")
-	writer = csv.writer(f)
+	#f = open(("Results_" + algo + "_i5.csv"), "w")
+	#writer = csv.writer(f)
 	print(algo)
 	for u in tqdm(range(epochs)):
 		# loadData
@@ -116,8 +116,8 @@ for algo in algorithms:
 		classifier = _TrainModel_SingleThread(X_train, X_test, y_train, y_test, algo, array)
 		#testModel
 		_TestModel_SingleThread(classifier, array)
-		writer.writerow(array)
-	f.close()
+		#writer.writerow(array)
+	#f.close()
 
 
 
