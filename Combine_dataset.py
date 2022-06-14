@@ -18,25 +18,103 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.metrics import classification_report, roc_curve, roc_auc_score
 
 
-dataset1 = pd.read_csv('SmartWatch1.csv')
-dataset2 = pd.read_csv('SmartWatch2.csv')
-dataset3 = pd.read_csv('SmartWatch3.csv')
-dataset1['outcome'].values[:] = 0
 
-data = [dataset1, dataset2, dataset3]
-datasetA = pd.concat(data)
-datasetA.to_csv("SmartWatchCombined.csv")
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total:
+        print()
+        
+        
+knn_file = open(("Comb_Results.csv"), "w")
+writer = csv.writer(knn_file)
 
-dataset4 = pd.read_csv('32ms_User1_LeftWrist.csv')
-dataset5 = pd.read_csv('32ms_User2_LeftWrist.csv')
-dataset6 = pd.read_csv('32ms_User3_LeftWrist.csv')
-dataset7 = pd.read_csv('32ms_User4_LeftWrist.csv')
-dataset8 = pd.read_csv('32ms_User5_LeftWrist.csv')
-dataset9 = pd.read_csv('32ms_User6_LeftWrist.csv')
-dataset10 = pd.read_csv('32ms_User7_LeftWrist.csv')
+data_time_s = time.time()
+dataset = pd.read_csv('Comb_dataset.csv')
+dataset.dropna(axis = 0, inplace = True)
+X = dataset.iloc[:, :-1].values
+y = dataset.iloc[:,-1].values
 
-data1 = [dataset4, dataset5, dataset6, dataset7, dataset8, dataset9, dataset10]
-datasetB = pd.concat(data1)
-datasetB.drop(datasetB.columns[4], axis=1, inplace=True)
-datasetB.to_csv("NotchCombined.csv")
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0)
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+data_time_e = time.time()
+data_time = data_time_e-data_time_s
+print("Data Loading time: " + str(data_time))
 
+
+array=[]
+for i in range(1,201,2):
+	array.append(i)
+	training_time_s_1 = time.time()
+	classifier_1 = KNeighborsClassifier(n_neighbors = i, metric = "euclidean")
+	classifier_1.fit(X_train, y_train)
+	scores_1= cross_val_score(classifier_1, X_train, y_train)
+	training_time_e_1 = time.time()
+	training_time_s_2 = time.time()
+	classifier_2 = KNeighborsClassifier(n_neighbors = i, metric = "manhattan")
+	classifier_2.fit(X_train, y_train)
+	scores_2 = cross_val_score(classifier_2, X_train, y_train)
+	training_time_e_2 = time.time()
+	training_time_s_5 = time.time()
+	classifier_5 = KNeighborsClassifier(n_neighbors = i, metric = "minkowski")
+	classifier_5.fit(X_train, y_train)
+	scores_5 = cross_val_score(classifier_5, X_train, y_train)
+	training_time_e_5 = time.time()
+	
+	training_time_1 = training_time_e_1-training_time_s_1
+	training_time_2 = training_time_e_2-training_time_s_2
+	training_time_5 = training_time_e_5-training_time_s_5
+	
+	array.append(training_time_1)
+	array.append(training_time_2)
+	array.append(training_time_5)
+
+	testing_time_s_1 = time.time()
+	y_pred = classifier_1.predict(X_test)
+	accuracy_1 = accuracy_score(y_test,y_pred)
+	testing_time_e_1 = time.time()
+	
+	testing_time_s_2 = time.time()
+	y_pred = classifier_2.predict(X_test)
+	accuracy_2 = accuracy_score(y_test,y_pred)
+	testing_time_e_2 = time.time()
+	
+	testing_time_s_5 = time.time()
+	y_pred = classifier_5.predict(X_test)
+	accuracy_5 = accuracy_score(y_test,y_pred)
+	testing_time_e_5 = time.time()
+	
+	testing_time_1 = testing_time_e_1-testing_time_s_1
+	testing_time_2 = testing_time_e_2-testing_time_s_2
+	testing_time_5 = testing_time_e_5-testing_time_s_5
+	
+	array.append(testing_time_1)
+	array.append(testing_time_2)
+	array.append(testing_time_5)
+	
+	array.append(accuracy_1)
+	array.append(accuracy_2)
+	array.append(accuracy_5)
+	
+	writer.writerow(array)
+	print(array)
+	array = []
+	printProgressBar(i, 201, prefix = ' Progress:', suffix = 'Complete', length = 50)
+knn_file.close()
