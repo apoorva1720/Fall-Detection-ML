@@ -1,6 +1,6 @@
 import threading
 import pandas as pd
-import numpy
+import numpy as np
 import time
 import csv
 import matplotlib.pyplot as plt
@@ -22,7 +22,7 @@ false_rate = 0
 specificity = 0
 #Defining global variables
 epochs = 1
-#algo = "SVM"mo
+#algo = "SVM"
 algorithms = ["KNN", "Logistic Regression", "Naive Bayes", "Random Forest"]
 
 #Defining data loading function for single thread execution
@@ -64,12 +64,9 @@ def _LoadData_SingleThread(array):
 	X_1 = dataset12.iloc[:, :-2].values
 	y_1 = dataset12.iloc[:,-2].values
 
-	X_test = [X, X_1]
-	y_test = [y, y_1]
-	
-	X_test = pd.concat(X_test)
-	y_test = pd.concat(y_test)
-	
+	X_test = np.concatenate((X,X_1))
+	y_test = np.concatenate((y, y_1))
+
 	
 	sc = StandardScaler()
 	X_train = sc.fit_transform(X_train)
